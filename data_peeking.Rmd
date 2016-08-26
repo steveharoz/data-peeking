@@ -1,0 +1,141 @@
+---
+title: "Data Peeking Is Worse than You Thought"
+author: "Steve Haroz"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+An R version of the simulation of data peeking (optional stopping) by Sam Schwarzkopf.
+
+Explanation at https://neuroneurotic.net/2016/08/25/realistic-data-peeking-isnt-as-bad-as-you-thought-its-worse/
+
+```{r setup, warning = FALSE, message = FALSE}
+# install.packages('MASS') # for mvrnorm
+library(ggplot2)
+library(dplyr)
+```
+
+## Define the main simulation function
+
+```{r simulation_function}
+SimulOptStopCorr = function (rho) {
+  
+  # Number of simulations
+  Ni = 1000
+  # Maximum sample size
+  mN = 150
+  # Starting sample size
+  sN = 3
+  
+  # Non-significance levels
+  LowP = 0.1
+  MedP = 0.3
+  HigP = 0.5
+  
+  # results data.frame
+  row_count = Ni*4
+  Pvals = data.frame(
+    rho      = rep(rho, row_count),
+    category = rep(NA, row_count), 
+    n        = rep(NA, row_count), 
+    r        = rep(NA, row_count), 
+    p        = rep(NA, row_count)
+  )
+  
+  # Simulate Ni times
+  for (i in 1:Ni) {
+    # Criteria fulfilled?
+    CriterionReached = c(0,0,0,0)
+    
+    # Full data set
+    X = MASS::mvrnorm(mN, c(0,0), matrix(c(1,rho,rho,1), 2))
+    
+    # Starting with small sample
+    n = sN; 
+    
+    while (mean(CriterionReached) < 1) {
+      # Analyse current sample
+      currentAnalysis = cor.test(X[1:n,1], X[1:n,2])
+      r = currentAnalysis$estimate
+      p = currentAnalysis$p.value
+      
+      # Significant p only
+      if ((p < 0.05 || n == mN) && CriterionReached[1]==0) {
+        CriterionReached[1] = 1
+        Pvals[(i-1)*4+1,] = list(rho, 'Significant only', n, r, p) 
+      }
+      # Significant p or low p 
+      if ((p < 0.05 || p > LowP || n == mN) && CriterionReached[2]==0) {
+        CriterionReached[2] = 1
+        Pvals[(i-1)*4+2,] = list(rho, 'Significant or p > 0.1', n, r, p) 
+      }
+      # Significant p or medium p 
+      if ((p < 0.05 || p > MedP || n == mN) && CriterionReached[3]==0) {
+        CriterionReached[3] = 1
+        Pvals[(i-1)*4+3,] = list(rho, 'Significant or p > 0.3', n, r, p) 
+      }
+      # Significant p or high p 
+      if ((p < 0.05 || p > HigP || n == mN) && CriterionReached[4]==0) {
+        CriterionReached[4] = 1
+        Pvals[(i-1)*4+4,] = list(rho, 'Significant or p > 0.5', n, r, p) 
+      }
+      
+      # Increase sample size
+      n = n + 1
+      if (n > mN)
+        # Don't allow it to surpass maximum
+        n = mN
+    }
+  }
+  
+  return(Pvals)
+}
+```
+
+## Run the simulation
+
+```{r}
+# multiple rho values
+rhos = seq(0,.9, .3)
+# run the simulation on each rho
+Pvals = lapply(rhos, SimulOptStopCorr)
+# combine sim results into one big data frame
+Pvals = bind_rows(Pvals)
+```
+
+## Plot the positive hit rate
+
+```{r}
+# determine the proportion significant for each condition
+proportionData = Pvals %>%
+  group_by(category, rho) %>%
+  summarise(proportionSignificant = mean(p < 0.05))
+
+# simple graph theme with no gridlines
+mytheme = 
+  theme_classic(15) +
+  theme(
+    axis.line.x = element_line(colour='black', size=1, linetype='solid'),
+    axis.line.y = element_line(colour='black', size=1, linetype='solid'))
+
+# false positive plot
+ggplot(proportionData) +
+  aes(x=rho, y=proportionSignificant, color=category, group=category) +
+  geom_hline(yintercept=0.05, linetype='dashed', alpha=0.5) +
+  geom_line(size=1.5) +
+  geom_point(shape=21, fill='white', size=3, stroke=1.5) +
+  # make it fancy
+  geom_text( hjust=0, nudge_x = .03,
+    data=filter(proportionData, rho == max(rho)), 
+    aes(label=category)) +
+  scale_x_continuous(limits=c(0, 1.2), breaks=rhos) +
+  scale_color_brewer(palette = 'Set1', guide='none') +
+  labs(
+    x = expression(paste('True effect size (', rho, ')')),
+    y = 'Proportion (p < 0.05)',
+    color = NULL
+  ) +
+  mytheme
+```
+
