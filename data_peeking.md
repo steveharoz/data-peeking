@@ -121,7 +121,7 @@ Pvals = bind_rows(Pvals)
 ```
 
     ##    user  system elapsed 
-    ##    0.00    0.02    2.30
+    ##    0.00    0.00    2.78
 
 Plot the positive hit rate
 --------------------------
@@ -173,7 +173,7 @@ proportionData %>%
 
 |  rho|  Significant only|  Significant or p &gt; 0.1|  Significant or p &gt; 0.3|  Significant or p &gt; 0.5|
 |----:|-----------------:|--------------------------:|--------------------------:|--------------------------:|
-|    0|              0.44|                       0.08|                       0.14|                       0.18|
+|    0|              0.28|                       0.06|                       0.08|                       0.14|
 
 D' Analysis
 -----------
