@@ -4,11 +4,13 @@ author: "Steve Haroz"
 output: 
   html_document: 
     keep_md: yes
+params:
+  use_cache: TRUE
 ---
 
 An R version of the simulation of data peeking (optional stopping) by Sam Schwarzkopf.
 
-Explanation at https://neuroneurotic.net/2016/08/25/realistic-data-peeking-isnt-as-bad-as-you-thought-its-worse/
+Explanation and Matlab version at https://neuroneurotic.net/2016/08/25/realistic-data-peeking-isnt-as-bad-as-you-thought-its-worse/
 
 ```{r setup, warning = FALSE, message = FALSE}
 # install.packages('MASS') # for mvrnorm
@@ -18,8 +20,8 @@ library(dplyr)
 
 ## Define the main simulation function
 
-```{r simulation_function}
 SimulOptStopCorr = function (rho) {
+```{r simulation_function, cache=params$use_cache}
   
   # Number of simulations
   Ni = 1000
@@ -89,24 +91,28 @@ SimulOptStopCorr = function (rho) {
     }
   }
   
+  # output a status update
+  message('Finished rho = ', rho)
+  flush.console()
+  
   return(Pvals)
 }
 ```
 
 ## Run the simulation
 
-```{r}
 # multiple rho values
 rhos = seq(0,.9, .3)
 # run the simulation on each rho
 Pvals = lapply(rhos, SimulOptStopCorr)
+```{r simulate, results='hold', warning = FALSE, message = FALSE, cache=params$use_cache}
 # combine sim results into one big data frame
 Pvals = bind_rows(Pvals)
 ```
 
 ## Plot the positive hit rate
 
-```{r}
+```{r hit_rate_plot}
 # determine the proportion significant for each condition
 proportionData = Pvals %>%
   group_by(category, rho) %>%
