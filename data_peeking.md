@@ -1,6 +1,6 @@
 Data Peeking Is Worse than You Thought
 ================
-Steve Haroz
+by Steve Haroz
 
 An R version of the simulation of data peeking (optional stopping) by Sam Schwarzkopf.
 
@@ -27,7 +27,7 @@ Define the main simulation function
 SimulOptStopCorr = function (rho, significantP = 0.05) {
   
   # Number of simulations
-  Ni = 50
+  Ni = 5000
   # Maximum sample size
   mN = 150
   # Starting sample size
@@ -121,7 +121,7 @@ Pvals = bind_rows(Pvals)
 ```
 
     ##    user  system elapsed 
-    ##    0.00    0.00    2.78
+    ##    0.12    0.00  265.10
 
 Plot the positive hit rate
 --------------------------
@@ -159,7 +159,7 @@ ggplot(proportionData) +
   mytheme
 ```
 
-![](data_peeking_files/figure-markdown_github/hit_rate_plot-1.svg)
+![](data_peeking_files/figure-markdown_github/hit_rate_plot-1.png)
 
 False positive proportion (rho = 0)
 -----------------------------------
@@ -173,7 +173,7 @@ proportionData %>%
 
 |  rho|  Significant only|  Significant or p &gt; 0.1|  Significant or p &gt; 0.3|  Significant or p &gt; 0.5|
 |----:|-----------------:|--------------------------:|--------------------------:|--------------------------:|
-|    0|              0.28|                       0.06|                       0.08|                       0.14|
+|    0|            0.4038|                     0.0556|                      0.112|                     0.1544|
 
 D' Analysis
 -----------
@@ -217,4 +217,4 @@ ggplot(dprimeData) +
   mytheme
 ```
 
-![](data_peeking_files/figure-markdown_github/d_prime-1.svg)
+![](data_peeking_files/figure-markdown_github/d_prime-1.png)

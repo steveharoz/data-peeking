@@ -1,9 +1,8 @@
 ---
 title: "Data Peeking Is Worse than You Thought"
-author: "Steve Haroz"
+author: "by Steve Haroz"
 output: 
   github_document:
-    dev: svg
 params:
   use_cache: TRUE
 ---
@@ -109,7 +108,7 @@ SimulOptStopCorr = function (rho, significantP = 0.05) {
 
 ## Run the simulation
 
-```{r simulate, results='hold', warning = FALSE, message = FALSE, cache=params$use_cache}
+```{r simulate, results='hold', message=FALSE, cache=params$use_cache}
 # Calculate the number of cores
 coreCount = max(1, detectCores() - 1)
 # Initiate cluster
@@ -126,7 +125,7 @@ Pvals = bind_rows(Pvals)
 
 ## Plot the positive hit rate
 
-```{r hit_rate_plot}
+```{r hit_rate_plot, dpi=500}
 # determine the proportion significant for each condition
 proportionData = Pvals %>%
   group_by(category, rho) %>%
@@ -168,7 +167,7 @@ proportionData %>%
 ```
 
 ## D' Analysis
-``` {r d_prime}
+``` {r d_prime, dpi=500}
 d_prime = function(pH, pFA) {
   # Returns d-prime for given hit rate and false alarms:  z(pH)-z(pFA)
   # Second argument returns the response bias:    (z(pH)+z(pFA))/2
