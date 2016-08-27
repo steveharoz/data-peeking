@@ -1,30 +1,25 @@
-# Data Peeking Is Worse than You Thought
-Steve Haroz  
-
 An R version of the simulation of data peeking (optional stopping) by Sam Schwarzkopf.
 
-Explanation and Matlab version at https://neuroneurotic.net/2016/08/25/realistic-data-peeking-isnt-as-bad-as-you-thought-its-worse/
+Explanation and Matlab version at <https://neuroneurotic.net/2016/08/25/realistic-data-peeking-isnt-as-bad-as-you-thought-its-worse/>
 
-
-```r
+``` r
 # install.packages('MASS') # for mvrnorm
 library(ggplot2)
 library(dplyr)
 library(parallel)
 ```
 
-
-```r
+``` r
 # significant level
 significantP = 0.05
 # multiple rho values
 rhos = seq(0,.9, .1)
 ```
 
-## Define the main simulation function
+Define the main simulation function
+-----------------------------------
 
-
-```r
+``` r
 SimulOptStopCorr = function (rho, significantP = 0.05) {
   
   # Number of simulations
@@ -103,10 +98,10 @@ SimulOptStopCorr = function (rho, significantP = 0.05) {
 }
 ```
 
-## Run the simulation
+Run the simulation
+------------------
 
-
-```r
+``` r
 # Calculate the number of cores
 coreCount = max(1, detectCores() - 1)
 # Initiate cluster
@@ -121,15 +116,13 @@ stopCluster(cluster)
 Pvals = bind_rows(Pvals)
 ```
 
-```
-##    user  system elapsed 
-##    0.08    0.01  247.05
-```
+    ##    user  system elapsed 
+    ##    0.11    0.02  271.75
 
-## Plot the positive hit rate
+Plot the positive hit rate
+--------------------------
 
-
-```r
+``` r
 # determine the proportion significant for each condition
 proportionData = Pvals %>%
   group_by(category, rho) %>%
@@ -162,26 +155,26 @@ ggplot(proportionData) +
   mytheme
 ```
 
-![](data_peeking_files/figure-html/hit_rate_plot-1.svg)<!-- -->
+![](data_peeking_files/figure-markdown_github/hit_rate_plot-1.svg)
 
-## False positive proportion (rho = 0)
+False positive proportion (rho = 0)
+-----------------------------------
 
-```r
+``` r
 proportionData %>% 
   filter(rho == 0) %>%
   tidyr::spread(category, proportionSignificant) %>% 
   knitr::kable()
 ```
 
+|  rho|  Significant only|  Significant or p &gt; 0.1|  Significant or p &gt; 0.3|  Significant or p &gt; 0.5|
+|----:|-----------------:|--------------------------:|--------------------------:|--------------------------:|
+|    0|             0.398|                     0.0694|                     0.1212|                     0.1646|
 
+D' Analysis
+-----------
 
- rho   Significant only   Significant or p > 0.1   Significant or p > 0.3   Significant or p > 0.5
-----  -----------------  -----------------------  -----------------------  -----------------------
-   0             0.3978                    0.061                   0.1166                     0.16
-
-## D' Analysis
-
-```r
+``` r
 d_prime = function(pH, pFA) {
   # Returns d-prime for given hit rate and false alarms:  z(pH)-z(pFA)
   # Second argument returns the response bias:    (z(pH)+z(pFA))/2
@@ -220,4 +213,4 @@ ggplot(dprimeData) +
   mytheme
 ```
 
-![](data_peeking_files/figure-html/d_prime-1.svg)<!-- -->
+![](data_peeking_files/figure-markdown_github/d_prime-1.svg)
