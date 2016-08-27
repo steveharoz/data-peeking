@@ -2,8 +2,7 @@
 title: "Data Peeking Is Worse than You Thought"
 author: "Steve Haroz"
 output: 
-  html_document: 
-    keep_md: yes
+  github_document:
     dev: svg
 params:
   use_cache: TRUE

@@ -1,3 +1,7 @@
+Data Peeking Is Worse than You Thought
+================
+Steve Haroz
+
 An R version of the simulation of data peeking (optional stopping) by Sam Schwarzkopf.
 
 Explanation and Matlab version at <https://neuroneurotic.net/2016/08/25/realistic-data-peeking-isnt-as-bad-as-you-thought-its-worse/>
@@ -23,7 +27,7 @@ Define the main simulation function
 SimulOptStopCorr = function (rho, significantP = 0.05) {
   
   # Number of simulations
-  Ni = 5000
+  Ni = 50
   # Maximum sample size
   mN = 150
   # Starting sample size
@@ -117,7 +121,7 @@ Pvals = bind_rows(Pvals)
 ```
 
     ##    user  system elapsed 
-    ##    0.11    0.02  271.75
+    ##    0.00    0.02    2.30
 
 Plot the positive hit rate
 --------------------------
@@ -169,7 +173,7 @@ proportionData %>%
 
 |  rho|  Significant only|  Significant or p &gt; 0.1|  Significant or p &gt; 0.3|  Significant or p &gt; 0.5|
 |----:|-----------------:|--------------------------:|--------------------------:|--------------------------:|
-|    0|             0.398|                     0.0694|                     0.1212|                     0.1646|
+|    0|              0.44|                       0.08|                       0.14|                       0.18|
 
 D' Analysis
 -----------
