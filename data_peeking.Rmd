@@ -159,3 +159,11 @@ ggplot(proportionData) +
   ) +
   mytheme
 ```
+
+## False positive proportion (rho = 0)
+```{r data_dump}
+proportionData %>% 
+  filter(rho == 0) %>%
+  tidyr::spread(category, proportionSignificant) %>% 
+  knitr::kable()
+```
